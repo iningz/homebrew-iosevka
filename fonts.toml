@@ -2,7 +2,7 @@ repo = "iningz/homebrew-iosevka"
 upstream_repo = "be5invis/Iosevka"
 homepage = "https://typeof.net/Iosevka/"
 
-build_jobs = 12
+build_jobs = 10
 
 casks = [
   "font-iosevka-ss04",
