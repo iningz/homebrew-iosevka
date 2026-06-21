@@ -21,7 +21,7 @@
               nushell
               gh
               git
-              nodejs
+              nodejs-slim_24
               zip
               unzip
               fontforge
