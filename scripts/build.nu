@@ -22,12 +22,17 @@ export def run [tag: string, ver: string] {
 
     cd $src
     ^npm ci
+    let j_cmd = (try { load-manifest | get build_jobs } catch { null })
     for cask in $casks {
         let stem = (stem-of $cask)
         let zip_name = (release-asset-of $cask $ver)
         let zip_path = $build | path join $zip_name
 
-        ^npm run build -- $"ttf-unhinted::($stem)"
+        if $j_cmd != null {
+            ^npm run build -- $"ttf-unhinted::($stem)" $"--jCmd=($j_cmd)"
+        } else {
+            ^npm run build -- $"ttf-unhinted::($stem)"
+        }
         cd ($src | path join $"dist/($stem)/TTF-Unhinted")
         ^zip -r $zip_path ./*.ttf
         print $"wrote ($zip_path)"
