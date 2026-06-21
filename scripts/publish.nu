@@ -31,5 +31,5 @@ export def run [version: string] {
     } else {
         ^gh release create $tag ...$upload --title $"Iosevka ($ver)" --notes $notes
     }
-    print $"published ($upload | length) asset(s) to release ($tag)"
+    print $"published ($upload | length) assets to release ($tag)"
 }
