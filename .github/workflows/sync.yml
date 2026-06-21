@@ -1,0 +1,78 @@
+name: Sync Iosevka tap
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "0 5 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  version:
+    runs-on: lab
+    outputs:
+      need_release: ${{ steps.version.outputs.need_release }}
+      need_build: ${{ steps.version.outputs.need_build }}
+      need_patch: ${{ steps.version.outputs.need_patch }}
+      tag: ${{ steps.version.outputs.tag }}
+      ver: ${{ steps.version.outputs.ver }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve upstream version and release gate
+        id: version
+        run: nix develop --command nu scripts/main.nu version
+
+  release:
+    runs-on: lab
+    needs: version
+    if: needs.version.outputs.need_release == 'true'
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build casks
+        if: needs.version.outputs.need_build == 'true'
+        run: nix develop --command nu scripts/main.nu build ${{ needs.version.outputs.tag }} ${{ needs.version.outputs.ver }}
+
+      - name: Patch casks
+        if: needs.version.outputs.need_patch == 'true'
+        run: nix develop --command nu scripts/main.nu patch ${{ needs.version.outputs.tag }} ${{ needs.version.outputs.ver }}
+
+      - name: Publish release assets
+        run: nix develop --command nu scripts/main.nu publish ${{ needs.version.outputs.ver }} ${{ needs.version.outputs.tag }}
+
+  bump-casks:
+    runs-on: lab
+    needs: [version, release]
+    if: >-
+      always() && needs.version.result == 'success'
+      && (needs.release.result == 'success' || needs.release.result == 'skipped')
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Regenerate casks
+        run: nix develop --command nu scripts/main.nu bump-casks ${{ needs.version.outputs.ver }}
+
+      - name: Commit cask updates
+        env:
+          VER: ${{ needs.version.outputs.ver }}
+        run: |
+          nix develop --command bash -euc "
+            set -euo pipefail
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            if git diff --quiet Casks/; then
+              echo 'Casks already up to date'
+              exit 0
+            fi
+            git add Casks/
+            git commit -m \"chore: bump casks to Iosevka ${VER}\"
+            git push
+          "

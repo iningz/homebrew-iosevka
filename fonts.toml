@@ -1,0 +1,11 @@
+repo = "iningz/homebrew-iosevka"
+upstream_repo = "be5invis/Iosevka"
+homepage = "https://typeof.net/Iosevka/"
+
+casks = [
+  "font-iosevka-ss04",
+  "font-iosevka-aile",
+  "font-iosevka-etoile",
+  "font-iosevka-slab-ss04",
+  "font-iosevka-term-ss04-nerd-font",
+]
