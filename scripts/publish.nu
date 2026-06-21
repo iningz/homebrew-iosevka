@@ -22,7 +22,8 @@ export def run [ver: string, tag: string] {
         error make { msg: "no release assets to upload under .build/" }
     }
 
-    let notes = $"[Iosevka ($tag)](https://github.com/(upstream-repo)/releases/tag/($tag))"
+    let release_link = $"https://github.com/(upstream-repo)/releases/tag/($tag)"
+    let notes = $"[Iosevka ($tag)]" + '(' + $release_link + ')'
     let view = (^gh release view $vtag | complete)
     if $view.exit_code == 0 {
         ^gh release upload $vtag ...$upload --clobber
