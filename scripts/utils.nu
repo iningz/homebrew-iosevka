@@ -34,7 +34,7 @@ export def emit-outputs [pairs: record] {
     for key in ($pairs | columns) {
         let line = $"($key)=($pairs | get $key)"
         if ($env.GITHUB_OUTPUT? | default "") != "" {
-            $line | save -a $env.GITHUB_OUTPUT
+            $"($line)\n" | save --append $env.GITHUB_OUTPUT
         }
         print $line
     }

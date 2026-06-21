@@ -20,20 +20,20 @@ jobs:
       tag: ${{ steps.version.outputs.tag }}
       ver: ${{ steps.version.outputs.ver }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Resolve upstream version and release gate
         id: version
         run: nix develop --command nu scripts/main.nu version
 
-  release:
+  build-release:
     runs-on: lab
     needs: version
     if: needs.version.outputs.need_release == 'true'
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Build casks
         if: needs.version.outputs.need_build == 'true'
@@ -48,12 +48,12 @@ jobs:
 
   bump-casks:
     runs-on: lab
-    needs: [version, release]
+    needs: [version, build-release]
     if: >-
       always() && needs.version.result == 'success'
-      && (needs.release.result == 'success' || needs.release.result == 'skipped')
+      && (needs.build-release.result == 'success' || needs.build-release.result == 'skipped')
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -61,8 +61,6 @@ jobs:
         run: nix develop --command nu scripts/main.nu bump-casks ${{ needs.version.outputs.ver }}
 
       - name: Commit cask updates
-        env:
-          VER: ${{ needs.version.outputs.ver }}
         run: |
           nix develop --command bash -euc "
             set -euo pipefail
@@ -73,6 +71,6 @@ jobs:
               exit 0
             fi
             git add Casks/
-            git commit -m \"chore: bump casks to Iosevka ${VER}\"
+            git commit -m \"chore: bump casks to Iosevka ${{ needs.version.outputs.ver }}\"
             git push
           "

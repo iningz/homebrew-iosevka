@@ -53,7 +53,7 @@ def main [cmd: string, ...args: string, --allow-partial-release] {
                 publish run $args.0 $args.1
             }
             "bump-casks" => {
-                if ($args | length) < 1 {
+                if ($args | length) < 1 or ($args.0 | str trim) == "" {
                     error make { msg: "usage: bump-casks <ver> [--allow-partial-release]" }
                 }
                 if $allow_partial_release {

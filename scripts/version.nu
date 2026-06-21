@@ -3,7 +3,7 @@
 use ./utils.nu *
 
 def version-state [] {
-    let upstream = (http get "https://api.github.com/repos/be5invis/Iosevka/releases/latest")
+    let upstream = (http get $"https://api.github.com/repos/(upstream-repo)/releases/latest")
     let tag = $upstream.tag_name
     if not ($tag =~ '^v[0-9]+\.[0-9]+\.[0-9]+$') {
         error make { msg: $"unexpected upstream tag: ($tag)" }
