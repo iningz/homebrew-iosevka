@@ -44,7 +44,7 @@ export def run [ver: string, --allow-partial-release] {
 }
 
 def fetch_upstream_sha [ver: string, upstream_repo: string] {
-    let url = $"https://github.com/($upstream_repo)/releases/download/v($ver)/SHA-256.txt"
+    let url = $"https://github.com/($upstream_repo)/releases/download/(tag-of $ver)/SHA-256.txt"
     let body = (http get -r $url | decode utf-8)
     mut map = {}
     for line in ($body | lines | where {|l| ($l | str trim) != "" }) {
@@ -57,7 +57,7 @@ def fetch_upstream_sha [ver: string, upstream_repo: string] {
 }
 
 def fetch_release_sha [ver: string, repo: string] {
-    let api = $"https://api.github.com/repos/($repo)/releases/tags/v($ver)"
+    let api = $"https://api.github.com/repos/($repo)/releases/tags/(tag-of $ver)"
     let release = try {
         http get $api
     } catch {

@@ -30,6 +30,20 @@ export def tap-repo [] {
     $env.GITHUB_REPOSITORY? | default (load-manifest | get repo)
 }
 
+# Canonical version form is bare (e.g. "34.6.3"). Accept either form on input.
+export def parse-version [input: string] {
+    let s = ($input | str trim | str replace -r '^v' '')
+    if not ($s =~ '^[0-9]+\.[0-9]+\.[0-9]+$') {
+        error make { msg: $"expected version like v1.2.3 or 1.2.3, got: ($input)" }
+    }
+    $s
+}
+
+# GitHub git tags and release URLs use a leading "v"; asset names do not.
+export def tag-of [ver: string] {
+    $"v($ver)"
+}
+
 export def emit-outputs [pairs: record] {
     for key in ($pairs | columns) {
         let line = $"($key)=($pairs | get $key)"

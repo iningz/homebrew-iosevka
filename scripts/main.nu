@@ -14,7 +14,7 @@ use ./bump-casks.nu
 def run-all [] {
     let v = (with-env { REPO_ROOT: $REPO_ROOT } { version state })
     if $v.need_release == "true" {
-        print $"would run release: build=($v.need_build) patch=($v.need_patch) ver=($v.ver) tag=($v.tag)"
+        print $"would run release: build=($v.need_build) patch=($v.need_patch) ver=($v.ver)"
         print "dry-run; not building or publishing"
         return
     }
@@ -35,22 +35,22 @@ def main [cmd: string, ...args: string, --allow-partial-release] {
         match $cmd {
             "version" => { version run }
             "build" => {
-                if ($args | length) != 2 {
-                    error make { msg: "usage: build <tag> <ver>" }
+                if ($args | length) != 1 {
+                    error make { msg: "usage: build <version>  (e.g. v34.6.3 or 34.6.3)" }
                 }
-                build run $args.0 $args.1
+                build run $args.0
             }
             "patch" => {
-                if ($args | length) != 2 {
-                    error make { msg: "usage: patch <tag> <ver>" }
+                if ($args | length) != 1 {
+                    error make { msg: "usage: patch <version>" }
                 }
-                patch run $args.0 $args.1
+                patch run $args.0
             }
             "publish" => {
-                if ($args | length) != 2 {
-                    error make { msg: "usage: publish <ver> <tag>" }
+                if ($args | length) != 1 {
+                    error make { msg: "usage: publish <version>" }
                 }
-                publish run $args.0 $args.1
+                publish run $args.0
             }
             "bump-casks" => {
                 if ($args | length) < 1 or ($args.0 | str trim) == "" {

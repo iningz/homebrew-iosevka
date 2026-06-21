@@ -2,7 +2,9 @@
 
 use ./utils.nu *
 
-export def run [tag: string, ver: string] {
+export def run [version: string] {
+    let ver = (parse-version $version)
+    let tag = (tag-of $ver)
     let build = (build-dir)
     let casks = (manifest-casks | where {|c| (kind-of $c) == "patch" })
     if ($casks | is-empty) {

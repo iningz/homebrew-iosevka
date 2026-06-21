@@ -8,9 +8,9 @@ def version-state [] {
     if not ($tag =~ '^v[0-9]+\.[0-9]+\.[0-9]+$') {
         error make { msg: $"unexpected upstream tag: ($tag)" }
     }
-    let ver = ($tag | str replace "v" "")
+    let ver = (parse-version $tag)
 
-    let api = $"https://api.github.com/repos/((tap-repo))/releases/tags/v($ver)"
+    let api = $"https://api.github.com/repos/((tap-repo))/releases/tags/(tag-of $ver)"
     let asset_names = (try {
         http get $api | get assets? | default [] | get name
     } catch {
@@ -37,7 +37,6 @@ def version-state [] {
 
     let need_release = $need_build or $need_patch
     {
-        tag: $tag
         ver: $ver
         need_build: ($need_build | into string)
         need_patch: ($need_patch | into string)

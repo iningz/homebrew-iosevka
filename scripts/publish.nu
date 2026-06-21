@@ -2,9 +2,10 @@
 
 use ./utils.nu *
 
-export def run [ver: string, tag: string] {
+export def run [version: string] {
+    let ver = (parse-version $version)
+    let tag = (tag-of $ver)
     let build = (build-dir)
-    let vtag = $"v($ver)"
     mut upload = []
 
     for cask in (manifest-casks) {
@@ -24,11 +25,11 @@ export def run [ver: string, tag: string] {
 
     let release_link = $"https://github.com/(upstream-repo)/releases/tag/($tag)"
     let notes = $"[Iosevka ($tag)]" + '(' + $release_link + ')'
-    let view = (^gh release view $vtag | complete)
+    let view = (^gh release view $tag | complete)
     if $view.exit_code == 0 {
-        ^gh release upload $vtag ...$upload --clobber
+        ^gh release upload $tag ...$upload --clobber
     } else {
-        ^gh release create $vtag ...$upload --title $"Iosevka ($ver)" --notes $notes
+        ^gh release create $tag ...$upload --title $"Iosevka ($ver)" --notes $notes
     }
-    print $"published ($upload | length) asset(s) to release ($vtag)"
+    print $"published ($upload | length) asset(s) to release ($tag)"
 }

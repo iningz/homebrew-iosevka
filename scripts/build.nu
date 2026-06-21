@@ -2,7 +2,9 @@
 
 use ./utils.nu *
 
-export def run [tag: string, ver: string] {
+export def run [version: string] {
+    let ver = (parse-version $version)
+    let tag = (tag-of $ver)
     let root = (repo-root)
     let build = (build-dir)
     let src = $build | path join "iosevka-src"
