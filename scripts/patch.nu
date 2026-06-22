@@ -13,11 +13,11 @@ export def run [version: string] {
     let patcher_zip = $build | path join "FontPatcher.zip"
     let patcher_dir = $build | path join "fontpatcher"
     let dl_dir = $build | path join "dl"
-    let out_dir = $build | path join "out"
+    let out_root = $build | path join "out"
 
     mkdir $build
     mkdir $dl_dir
-    mkdir $out_dir
+    mkdir $out_root
 
     if not ($patcher_zip | path exists) {
         http get -r $"https://github.com/ryanoasis/nerd-fonts/releases/latest/download/FontPatcher.zip"
@@ -33,23 +33,37 @@ export def run [version: string] {
     let patcher = $patcher_dir | path join "font-patcher"
     for cask in $casks {
         let term_zip = (upstream-asset-of $cask $ver)
-        let term_ttc = (upstream-ttc-of $cask)
         let term_url = $"https://github.com/(upstream-repo)/releases/download/($tag)/($term_zip)"
         let dl_term_zip = $dl_dir | path join $term_zip
         if not ($dl_term_zip | path exists) {
             http get -r $term_url | save -f $dl_term_zip
         }
-        ^unzip -q $dl_term_zip -d $dl_dir
+        let input_dir = $dl_dir | path join $cask
+        let out_dir = $out_root | path join $cask
+        if ($input_dir | path exists) {
+            ^rm -rf $input_dir
+        }
+        if ($out_dir | path exists) {
+            ^rm -rf $out_dir
+        }
+        mkdir $input_dir
+        mkdir $out_dir
+        ^unzip -q $dl_term_zip -d $input_dir
 
-        let input_ttc = $dl_dir | path join $term_ttc
-        ^fontforge --script $patcher $input_ttc --complete --quiet --no-progressbars --outputdir $out_dir
+        let inputs = (glob $"($input_dir)/*.ttf")
+        if ($inputs | is-empty) {
+            error make { msg: $"upstream asset ($term_zip) contains no .ttf files" }
+        }
+        for input in $inputs {
+            ^fontforge --script $patcher $input --complete --quiet --no-progressbars --outputdir $out_dir
+        }
 
-        let patched = (glob $"($out_dir)/*.ttc")
+        let patched = (glob $"($out_dir)/*.ttf")
         if ($patched | is-empty) {
-            error make { msg: $"font-patcher produced no .ttc for ($cask)" }
+            error make { msg: $"font-patcher produced no .ttf files for ($cask)" }
         }
         let dest = $build | path join (release-asset-of $cask $ver)
-        ^cp ($patched | first) $dest
+        ^zip -j $dest ...$patched
         print $"wrote ($dest)"
     }
 }

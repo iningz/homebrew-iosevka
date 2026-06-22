@@ -124,7 +124,7 @@ export def serifs-of [stem: string] {
 export def release-asset-of [cask: string, ver: string] {
     match (kind-of $cask) {
         "patch" => {
-            $"((patch-stem-of $cask)).Nerd.Font.ttc"
+            $"(package-of (stem-of $cask))-($ver).zip"
         }
         _ => {
             $"(package-of (stem-of $cask))-($ver).zip"
@@ -135,28 +135,13 @@ export def release-asset-of [cask: string, ver: string] {
 export def upstream-asset-of [cask: string, ver: string] {
     match (kind-of $cask) {
         "patch" => {
-            $"SuperTTC-SGr-((patch-stem-of $cask))-($ver).zip"
+            $"(package-of (patch-stem-of $cask))-($ver).zip"
         }
         "upstream" => {
             release-asset-of $cask $ver
         }
         "build" => {
             null
-        }
-    }
-}
-
-export def upstream-ttc-of [cask: string] {
-    $"SGr-((patch-stem-of $cask)).ttc"
-}
-
-export def font-glob-of [cask: string] {
-    match (kind-of $cask) {
-        "patch" => {
-            $"((patch-stem-of $cask)).Nerd.Font.ttc"
-        }
-        _ => {
-            $"(stem-of $cask)-*.ttf"
         }
     }
 }
