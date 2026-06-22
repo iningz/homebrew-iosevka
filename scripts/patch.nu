@@ -55,7 +55,7 @@ export def run [version: string] {
             error make { msg: $"upstream asset ($term_zip) contains no .ttf files" }
         }
         for input in $inputs {
-            ^fontforge --script $patcher $input --complete --quiet --no-progressbars --outputdir $out_dir
+            ^fontforge --script $patcher $input --complete --makegroups 6 --quiet --no-progressbars --outputdir $out_dir
         }
 
         let patched = (glob $"($out_dir)/*.ttf")
