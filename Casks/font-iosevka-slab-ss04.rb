@@ -1,6 +1,6 @@
 cask "font-iosevka-slab-ss04" do
-  version "34.6.3"
-  sha256 "b2fb38b7fa4bb8adac144086c88371f10aa0e2e574cbbe7a50e56ced35da69c9"
+  version "34.7.0"
+  sha256 "92b92b275a27fc2f1b6180cd24e7c0db2d64b9320c4ecfb275c3927055b77c0a"
 
   url "https://github.com/iningz/homebrew-iosevka/releases/download/v#{version}/PkgTTF-Unhinted-IosevkaSlabSS04-#{version}.zip"
   name "Iosevka Slab SS04"
