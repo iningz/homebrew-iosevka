@@ -1,6 +1,6 @@
 cask "font-iosevka-term-ss04-nerd-font" do
-  version "34.8.1"
-  sha256 "916f4b8850ef0ae5b6fdfb1c972998adf4854e7719b731dfd41caf8863bc641a"
+  version "34.9.0"
+  sha256 "8a9feafe13d6b6e1b326a9f5fca3eb7d669388934a99b0d7219415b37db4e717"
 
   url "https://github.com/iningz/homebrew-iosevka/releases/download/v#{version}/PkgTTF-Unhinted-IosevkaTermSS04NerdFont-#{version}.zip"
   name "Iosevka Term SS04 Nerd Font"
