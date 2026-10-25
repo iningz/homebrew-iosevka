@@ -1,6 +1,6 @@
 cask "font-iosevka-ss04" do
-  version "34.9.0"
-  sha256 "7f720210e6df4262387785e4e73bb5f8d8626daaf098017f907efe98bdb316de"
+  version "34.9.1"
+  sha256 "fc8ba6a050cda2667f67d9bfbfb4ed419289fd3f706bb91ffeb7a676384b69b5"
 
   url "https://github.com/be5invis/Iosevka/releases/download/v#{version}/PkgTTF-Unhinted-IosevkaSS04-#{version}.zip"
   name "Iosevka SS04"
